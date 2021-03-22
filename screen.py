@@ -1,4 +1,3 @@
-import random
 from termcolor2 import colored
 def randomPlayer():
     return colored('P', 'yellow')
