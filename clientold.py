@@ -5,6 +5,14 @@ import random
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 from os import system, name
+from enum import Enum
+from termcolor2 import colored
+class Rotation(Enum):
+    UP = 0
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 1
+rotationchar = [colored('↑','blue','on_green'),colored('→','blue','on_green'),colored('↓','blue','on_green'),colored('←','blue','on_green')]
 screensize = [32,16]
 
 # Collect events until released
@@ -34,14 +42,37 @@ class player():
         self.x = 0
         self.y = 0
         self.char = screen.randomPlayer()
+        self.rotation = 0
         self.id = 0
         self.players = {}
         self.sockets = {}
         self.delays = False
-    def move(self, xadd, yadd):
+    def move(self, forward, rotation = 0):
         if not self.delays:
-            self.x += xadd
-            self.y += yadd
+            xadd = 0
+            yadd = 0
+            if (rotation == 1):
+                self.rotation+=1
+            if (rotation == -1):
+                self.rotation-=1
+            if (self.rotation == 0):
+                yadd = -1
+            if (self.rotation == 1):
+                xadd = 1
+            if (self.rotation == 2):
+                yadd = 1
+            if (self.rotation == 3):
+                xadd = -1
+            if (self.rotation > 3):
+                self.rotation = 0
+            if (self.rotation < 0):
+                self.rotation = 3
+            if(forward > 0):
+                self.x += xadd
+                self.y += yadd
+            elif(forward < 0):
+                self.x -= xadd
+                self.y -= yadd
             if (self.x > screensize[0]-1):
                 self.x = 0
             elif(self.x < 0):
@@ -50,7 +81,8 @@ class player():
                 self.y = 0
             elif(self.y < 0):
                 self.y = screensize[1]-1
-            movedict = {'event': 'move', 'x': self.x, 'y': self.y, 'id': str(self.id)}
+            self.char = rotationchar[self.rotation]
+            movedict = {'event': 'move', 'x': self.x, 'y': self.y,'char':rotationchar[self.rotation], 'id': str(self.id)}
             print(movedict)
             send(str(movedict))
             self.delays = True
@@ -91,6 +123,7 @@ def receive():
                 print(mydict)
                 player.players[str(mydict['id'])]['x'] = mydict['x']
                 player.players[str(mydict['id'])]['y'] = mydict['y']
+                player.players[str(mydict['id'])]['char'] = mydict['char']
                 player.renderPlayers()
             if ("{update}" == msg):
                 send("getPlayers")
@@ -131,9 +164,8 @@ receive_thread = Thread(target=receive)
 receive_thread.start()
 player.id = str(random.randint(0, 9999))
 send(str(player.id))
-keyboard.on_press_key("w", lambda _:player.move(0,-1))
-keyboard.on_press_key("a", lambda _:player.move(-1,0))
-keyboard.on_press_key("s", lambda _:player.move(0,1))
-keyboard.on_press_key("d", lambda _:player.move(1,0))
+keyboard.on_press_key("w", lambda _:player.move(1,0))
+keyboard.on_press_key("a", lambda _:player.move(0,-1))
+keyboard.on_press_key("d", lambda _:player.move(0,1))
 keyboard.on_press_key("e", lambda _:player.debugInfo())
 keyboard.on_press_key("esc", lambda _:exit())
