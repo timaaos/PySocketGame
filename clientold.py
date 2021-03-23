@@ -41,7 +41,7 @@ class player():
     def __init__(self):
         self.x = 0
         self.y = 0
-        self.char = screen.randomPlayer()
+        self.char = rotationchar[0]
         self.rotation = 0
         self.id = 0
         self.players = {}
