@@ -1,5 +1,2 @@
 # PySocketGame
-a bad coded online game in terminal!
-## Todos:
-- [ ] Optimize code
-- [ ] Add wiki
+a bad coded online game in python!
