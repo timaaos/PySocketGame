@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Server for multithreaded (asynchronous) chat application."""
+import time
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import ast
+
+from repeat_timer import RepeatedTimer
 
 global getPlayerDict
 
@@ -24,7 +27,7 @@ def handle_client(client):  # Takes client socket as argument.
 
     name = client.recv(BUFSIZ).decode("utf8")[:-1]
     client.send(bytes('giveInfo', 'utf8'))
-
+    clientsnotready[client] = name
     clients[client] = name
     clientsbyname[name] = client
     players[name] = ast.literal_eval(client.recv(BUFSIZ).decode("utf8")[:-1])
@@ -41,6 +44,13 @@ def handle_client(client):  # Takes client socket as argument.
             break
         if msg == bytes("getPlayers", "utf8"):
             client.send(bytes("^players^⊘" + str(players), 'utf8'))
+            print('i sended players')
+        if 'getBlocks' in msg.decode('utf8'):
+            client.send(bytes("^blocks^⊘" + str(blocks), 'utf8'))
+            print('i sended blocks')
+            time.sleep(0.2)
+            del clientsnotready[client]
+
         if ("{'event':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
             print(mydict)
@@ -48,12 +58,17 @@ def handle_client(client):  # Takes client socket as argument.
             players[str(mydict['id'])]['y'] = mydict['y']
             players[str(mydict['id'])]['char'] = mydict['char']
 
-            broadcast(bytes(msg.decode('utf8').split(';')[0], 'utf8'))
+            broadcast(bytes(msg.decode('utf8'), 'utf8'))
         if ("{'blockplace':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
             print(mydict)
             blocks[str(mydict['block']['id'])] = mydict['block']
-            broadcast(bytes(msg.decode('utf8').split(';')[0], 'utf8'))
+            broadcast(bytes(msg.decode('utf8'), 'utf8'))
+        if ("{'bulletmove':" in msg.decode('utf8')):
+            mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
+            print(mydict)
+            bullets[str(mydict['bullet']['id'])] = mydict['bullet']
+            broadcast(bytes(msg.decode('utf8'), 'utf8'))
 
     del clients[client]
     del clientsbyname[name]
@@ -66,12 +81,21 @@ def broadcast(msg, prefix=""):  # prefix is for name identification.
     for sock in clients:
         sock.send(bytes(prefix, "utf8") + msg)
 
+def broadcastforready(msg, prefix=""):  # prefix is for name identification.
+    """Broadcasts a message to all the clients."""
+
+    for sock in clients:
+        if(sock in clientsnotready):
+            continue
+        sock.send(bytes(prefix, "utf8") + msg)
 
 clients = {}
+clientsnotready = {}
 clientsbyname = {}
 addresses = {}
 players = {}
 blocks = {}
+bullets = {}
 
 HOST = ''
 PORT = 33000
@@ -80,7 +104,18 @@ ADDR = (HOST, PORT)
 
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDR)
-
+def updateBullets():
+    for key,value in bullets.items():
+        print(value)
+        value['x'] = value['x'] + value['xadd']
+        value['y'] = value['y'] + value['yadd']
+        value['range'] = value['range'] - 1
+        if(value['range'] < 0):
+            del bullets[key]
+    print("^bullets^R" + str(bullets))
+    broadcastforready(bytes("^bullets^R" + str(bullets) + ';', 'utf8'))
+rt = RepeatedTimer(0.25, updateBullets)
+rt.start()
 if __name__ == "__main__":
     SERVER.listen(5)
     print("Waiting for connection...")

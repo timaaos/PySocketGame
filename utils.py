@@ -22,3 +22,13 @@ class Block():
         else:
             char = colored(self.chardmg, 'grey', 'on_' + self.color)
         self.char = char
+class Bullet():
+    def __init__(self):
+        self.range = 10
+        self.x = 0
+        self.y = 0
+        self.id = random.randint(0,9999999)
+        self.xadd = 0
+        self.yadd = 0
+    def getInfo(self):
+        return {'id':self.id,'x':self.x,'y':self.y,'range':self.range,'xadd':self.xadd,'yadd':self.yadd}
