@@ -3,9 +3,6 @@ from enum import Enum
 from termcolor2 import colored
 class Blocks(Enum):
     GRASS = colored('x', 'green','on_green')
-    CLAY = colored('O', 'white','on_white')
-    CLAY_BREAKED = colored('o', 'grey', 'on_white')
-    CLAY_ALMOST_BREAKED = colored('O', 'grey', 'on_white')
 class screen():
     def __init__(self, xsize, ysize,bgpix=Blocks.GRASS.value):
         self.screenstr = ""
