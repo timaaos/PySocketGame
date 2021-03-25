@@ -64,11 +64,16 @@ def handle_client(client):  # Takes client socket as argument.
             print(mydict)
             blocks[str(mydict['block']['id'])] = mydict['block']
             broadcast(bytes(msg.decode('utf8'), 'utf8'))
-        if ("{'bulletmove':" in msg.decode('utf8')):
+        if ("{'blockremove':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
             print(mydict)
-            bullets[str(mydict['bullet']['id'])] = mydict['bullet']
+            del blocks[str(mydict['id'])]
             broadcast(bytes(msg.decode('utf8'), 'utf8'))
+        #if ("{'bulletmove':" in msg.decode('utf8')):
+        #    mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
+        #    print(mydict)
+        #    bullets[str(mydict['bullet']['id'])] = mydict['bullet']
+        #    broadcast(bytes(msg.decode('utf8'), 'utf8'))
 
     del clients[client]
     del clientsbyname[name]
@@ -99,7 +104,7 @@ bullets = {}
 
 HOST = ''
 PORT = 33000
-BUFSIZ = 1024
+BUFSIZ = 2048
 ADDR = (HOST, PORT)
 
 SERVER = socket(AF_INET, SOCK_STREAM)
@@ -114,8 +119,8 @@ def updateBullets():
             del bullets[key]
     print("^bullets^R" + str(bullets))
     broadcastforready(bytes("^bullets^R" + str(bullets) + ';', 'utf8'))
-rt = RepeatedTimer(0.25, updateBullets)
-rt.start()
+#rt = RepeatedTimer(0.25, updateBullets)
+#rt.start()
 if __name__ == "__main__":
     SERVER.listen(5)
     print("Waiting for connection...")

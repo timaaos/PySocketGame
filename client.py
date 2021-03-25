@@ -93,7 +93,7 @@ class player():
             elif(self.y < 0):
                 self.y = screensize[1]-1
             self.char = rotationchar[self.rotation]
-            movedict = {'event': 'move', 'x': self.x, 'y': self.y,'char':rotationchar[self.rotation], 'id': str(self.id)}
+            movedict = {'event': 'move', 'x': self.x, 'y': self.y,'char':rotationchar[self.rotation],'rotation':self.rotation, 'id': str(self.id)}
             #print(movedict)
             send(str(movedict))
             self.delays = True
@@ -101,6 +101,11 @@ class player():
             self.delays = False
         else:
             return
+    def removeBlock(self):
+        pos = self.getForwardPos()
+        if(self.isBlock(pos)):
+            send(str({'blockremove':True,'id':self.getBlockIdByPos(pos)}))
+
     def getForwardPos(self):
         yadd = 0
         xadd = 0
@@ -143,6 +148,12 @@ class player():
         for key, value in player.blocks.items():
             if(value['x'] == pos[0] and value['y'] == pos[1]):
                 return True
+        return False
+    def getBlockIdByPos(self,pos):
+        if(self.isBlock(pos)):
+            for key, value in player.blocks.items():
+                if(value['x'] == pos[0] and value['y'] == pos[1]):
+                    return value['id']
         return False
     def pewpew(self):
         if(self.reload): return
@@ -208,6 +219,7 @@ def receive():
                 player.players[str(mydict['id'])]['x'] = mydict['x']
                 player.players[str(mydict['id'])]['y'] = mydict['y']
                 player.players[str(mydict['id'])]['char'] = mydict['char']
+                player.players[str(mydict['id'])]['rotation'] = mydict['rotation']
                 player.renderPlayers()
             if ("{'blockplace':" in msg):
                 mydict = ast.literal_eval(msg.split(';')[0])
@@ -219,6 +231,11 @@ def receive():
                 player.bullets[str(mydict['bullet']['id'])] = mydict['bullet']
             if ("{update}" == msg):
                 send("getPlayers")
+            if ("{'blockremove':" in msg):
+                mydict = ast.literal_eval(msg.split(';')[0])
+                print(mydict)
+                del player.blocks[str(mydict['id'])]
+                player.renderPlayers()
             if("giveInfo" == msg):
                 send(player.infodict())
                 send("getPlayers")
@@ -248,7 +265,7 @@ if not PORT:
     PORT = 33000
 else:
     PORT = int(PORT)
-BUFSIZ = 1024
+BUFSIZ = 2048
 ADDR = (HOST, PORT)
 print("Colors:")
 cprint('Blue 1','blue','on_grey')
@@ -276,6 +293,6 @@ keyboard.on_release_key("w", lambda _:player.move(1,0))
 keyboard.on_release_key("s", lambda _:player.move(-1,0))
 keyboard.on_release_key("a", lambda _:player.move(0,-1))
 keyboard.on_release_key("d", lambda _:player.move(0,1))
-keyboard.on_release_key("q", lambda _:player.pewpew())
 keyboard.on_release_key("e", lambda _:player.placeBlock())
+keyboard.on_release_key("q", lambda _:player.removeBlock())
 keyboard.on_release_key("esc", lambda _:exit())
