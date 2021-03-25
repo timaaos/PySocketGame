@@ -1,6 +1,4 @@
 keyboard
 termcolor2
 termcolor
-ast
 colorama
-enum
