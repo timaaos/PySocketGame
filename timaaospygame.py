@@ -80,7 +80,7 @@ class PlayerSpr(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_img
-        self.image.set_colorkey(BLACK)
+        self.image.set_colorkey((228,228,228))
         self.rect = self.image.get_rect()
         self.rect.center = (0,0)
 def reloadSprites():
