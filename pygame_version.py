@@ -1,26 +1,21 @@
 import pygame
 from settings import Settings
-from board import draw
-from game_functions import check_events
+from game_functions import check_events, update_screen
 from character import Character
 
 if __name__ == '__main__':
     """Создаем окно в pygame"""
     pygame.init()
     settings = Settings()
-    size = width, height = settings.width, settings.height
-    screen = pygame.display.set_mode(size)
+    size = width, height = settings.width, settings.height - 50
+    screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
     """Главный игровой цикл"""
-    running = True
     clock = pygame.time.Clock()
-    pos = x, y = 0, 0
+    pos = x, y = (settings.width - settings.admin_width) // 2, 0
     character = Character(screen, x, y)
-    while running:
-        running = check_events()
+    while True:
+        check_events(character)
         # Рисуем поле
-        draw(screen)
-        character.blitme()
-        pygame.display.flip()
+        update_screen(screen, character)
         clock.tick(settings.fps)
-    pygame.quit()

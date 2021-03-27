@@ -1,8 +1,10 @@
 import pygame
+from settings import Settings
 
 
 class Character:
     def __init__(self, screen, x_pos, y_pos):
+        self.settings = Settings()
         self.screen = screen
         self.image = pygame.image.load('images/character_for_game.png')
         self.rect = self.image.get_rect()
