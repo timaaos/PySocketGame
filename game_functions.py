@@ -10,18 +10,18 @@ def check_down_events(event, character1):
     settings = Settings()
     if event.key == pygame.K_RIGHT and character1.rect.x + settings.speed_x * 2 < settings.width - (
             settings.width - settings.admin_width) // 2:
-        character1.rect.x += settings.speed_x
+        character1.x += settings.speed_x
         character1.centerx += settings.speed_x
     if event.key == pygame.K_LEFT and character1.rect.x - settings.speed_x >= (
             settings.width - settings.admin_width) // 2:
-        character1.rect.x -= settings.speed_x
+        character1.x -= settings.speed_x
         character1.centerx -= settings.speed_x
     if event.key == pygame.K_UP and character1.rect.y - settings.speed_y >= 0:
-        character1.rect.y -= settings.speed_y
+        character1.y -= settings.speed_y
         character1.centery -= settings.speed_y
     if event.key == pygame.K_DOWN and character1.rect.y + settings.speed_y * 2 <= settings.admin_height - (
             settings.admin_height * 0.20):
-        character1.rect.y += settings.speed_y
+        character1.y += settings.speed_y
         character1.centery += settings.speed_y
 
 

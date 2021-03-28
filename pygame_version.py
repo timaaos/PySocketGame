@@ -16,6 +16,7 @@ if __name__ == '__main__':
     character = Character(screen, x, y)
     while True:
         check_events(screen, character)
+        character.update()
         # Рисуем поле
         update_screen(screen, character)
         clock.tick(settings.fps)

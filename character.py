@@ -11,8 +11,15 @@ class Character:
         self.screen_rect = screen.get_rect()
         self.centerx = self.screen_rect.centerx
         self.centery = self.screen_rect.centery
+        self.x = x_pos
+        self.speed = 10
+        self.y = y_pos
         self.rect.x = x_pos
         self.rect.y = y_pos
 
     def blitme(self):
         self.screen.blit(self.image, self.rect)
+    def update(self):
+        self.rect.x = self.rect.x+((self.x-self.rect.x)/self.speed)
+        self.rect.y = self.rect.y+((self.y-self.rect.y)/self.speed)
+
