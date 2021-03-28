@@ -2,11 +2,11 @@ import pygame
 from settings import Settings
 
 
-class Character:
+class Block:
     def __init__(self, screen, x_pos, y_pos):
         self.settings = Settings()
         self.screen = screen
-        self.image = pygame.image.load('images/character.png')
+        self.image = pygame.image.load('images/block.png')
         self.rect = self.image.get_rect()
         self.screen_rect = screen.get_rect()
         self.centerx = self.screen_rect.centerx

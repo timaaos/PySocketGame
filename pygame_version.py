@@ -15,7 +15,7 @@ if __name__ == '__main__':
     pos = x, y = (settings.width - settings.admin_width) // 2, 0
     character = Character(screen, x, y)
     while True:
-        check_events(character)
+        check_events(screen, character)
         # Рисуем поле
         update_screen(screen, character)
         clock.tick(settings.fps)
