@@ -51,7 +51,10 @@ def isBlock(x, y):
         if block[0] == x and block[1] == y:
             return True
     return False
-
+def delBlock(x,y):
+    for block in block_list:
+        if block[0] == x and block[1] == y:
+            del block_list[block_list.index(block)]
 
 def check_mouse_events(event):
     settings = Settings()
@@ -61,7 +64,8 @@ def check_mouse_events(event):
             block_list.append(
                 [event.pos[0] - event.pos[0] % settings.speed_x, event.pos[1] - event.pos[1] % settings.speed_y])
     if pygame.mouse.get_pressed()[0]:
-        print("lmb clicked")
+        if(isBlock(event.pos[0] - event.pos[0] % settings.speed_x, event.pos[1] - event.pos[1] % settings.speed_y)):
+            delBlock(event.pos[0] - event.pos[0] % settings.speed_x, event.pos[1] - event.pos[1] % settings.speed_y)
         # TODO: block destroy
 
 
