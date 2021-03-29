@@ -45,10 +45,10 @@ def handle_client(client):  # Takes client socket as argument.
         if msg == bytes("getPlayers", "utf8"):
             client.send(bytes("^players^⊘" + str(players), 'utf8'))
             print('i sended players')
-        #if 'getBlocks' in msg.decode('utf8'):
-        #    client.send(bytes("^blocks^⊘" + str(blocks), 'utf8'))
-        #    print('i sended blocks')
-        #   time.sleep(0.2)
+        if 'getBlocks' in msg.decode('utf8'):
+           client.send(bytes("^blocks^⊘" + str(blocks), 'utf8'))
+           print('i sended blocks')
+           time.sleep(0.2)
 
         if ("{'event':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
@@ -56,6 +56,16 @@ def handle_client(client):  # Takes client socket as argument.
             players[str(mydict['id'])]['x'] = mydict['x']
             players[str(mydict['id'])]['y'] = mydict['y']
 
+            broadcast(bytes(msg.decode('utf8'), 'utf8'))
+        if ("{'blockplace':" in msg.decode('utf8')):
+            mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
+            print(mydict)
+            blocks[str(mydict['block']['id'])] = mydict['block']
+            broadcast(bytes(msg.decode('utf8'), 'utf8'))
+        if ("{'blockremove':" in msg.decode('utf8')):
+            mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
+            print(mydict)
+            del blocks[str(mydict['id'])]
             broadcast(bytes(msg.decode('utf8'), 'utf8'))
 
     del clients[client]
