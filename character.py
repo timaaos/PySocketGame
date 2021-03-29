@@ -21,5 +21,12 @@ class Character:
         self.screen.blit(self.image, self.rect)
     def update(self):
         self.rect.x = self.rect.x+((self.x-self.rect.x)/self.speed)
+        if ((self.x - self.rect.x) / self.speed < 1 and(self.x - self.rect.x) / self.speed > 0):
+            self.rect.x = self.x
+        if ((self.x - self.rect.x) / self.speed > -1 and(self.x - self.rect.x) / self.speed < 0):
+            self.rect.x = self.x
         self.rect.y = self.rect.y+((self.y-self.rect.y)/self.speed)
-
+        if ((self.y - self.rect.y) / self.speed > -1 and(self.y - self.rect.y) / self.speed < 0):
+            self.rect.y = self.y
+        if ((self.y - self.rect.y) / self.speed < 1 and(self.y - self.rect.y) / self.speed > 0):
+            self.rect.y = self.y
