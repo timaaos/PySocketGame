@@ -2,6 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from block import Block
+import inputbox
 
 block_list = []
 pygame.font.init()  # you have to call this at the start,
@@ -9,25 +10,41 @@ pygame.font.init()  # you have to call this at the start,
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
 
-def check_down_events(event, character1):
+def check_down_events(event, character1, screen):
     settings = Settings()
+    if (event.key == pygame.K_t):
+        command = inputbox.ask(screen, "Enter command(help for help)")
+        if command == ['h', 'e', 'l', 'p']:
+            inputbox.say(screen, "TP - teleports player, using: tp;10;10", 0, True)
+        if command[0] == "t" and command[1] == "p":
+            args = "".join(command).split(";")
+            character1.x = (int(args[1]) - 1) * settings.speed_x
+            character1.y = (int(args[2]) - 1) * settings.speed_y
     if (
             event.key == pygame.K_RIGHT or event.key == pygame.K_d) and character1.x + settings.speed_x * 2 < settings.width - (
-            settings.width - settings.admin_width) // 2:
+            settings.width - settings.admin_width) // 2 and not isBlock(character1.x + settings.speed_x, character1.y):
         character1.x += settings.speed_x
         character1.centerx += settings.speed_x
     if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and character1.x - settings.speed_x >= (
-            settings.width - settings.admin_width) // 2:
+            settings.width - settings.admin_width) // 2 and not isBlock(character1.x - settings.speed_x, character1.y):
         character1.x -= settings.speed_x
         character1.centerx -= settings.speed_x
-    if (event.key == pygame.K_UP or event.key == pygame.K_w) and character1.y - settings.speed_y >= 0:
+    if (event.key == pygame.K_UP or event.key == pygame.K_w) and character1.y - settings.speed_y >= 0 and not isBlock(
+            character1.x, character1.y - settings.speed_y):
         character1.y -= settings.speed_y
         character1.centery -= settings.speed_y
     if (
             event.key == pygame.K_DOWN or event.key == pygame.K_s) and character1.y + settings.speed_y * 2 <= settings.admin_height - (
-            settings.admin_height * 0.20):
+            settings.admin_height * 0.20) and not isBlock(character1.x, character1.y + settings.speed_y):
         character1.y += settings.speed_y
         character1.centery += settings.speed_y
+
+
+def isBlock(x, y):
+    for block in block_list:
+        if block[0] == x and block[1] == y:
+            return True
+    return False
 
 
 def check_mouse_events(event):
@@ -48,7 +65,7 @@ def check_events(screen, character1):
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            check_down_events(event, character1)
+            check_down_events(event, character1, screen)
         if event.type == pygame.MOUSEBUTTONDOWN:
             check_mouse_events(event)
 

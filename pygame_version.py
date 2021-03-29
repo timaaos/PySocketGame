@@ -2,7 +2,6 @@ import pygame
 from settings import Settings
 from game_functions import check_events, update_screen
 from character import Character
-
 if __name__ == '__main__':
     """Создаем окно в pygame"""
     pygame.init()
