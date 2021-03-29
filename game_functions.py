@@ -15,11 +15,17 @@ def check_down_events(event, character1, screen):
     if (event.key == pygame.K_t):
         command = inputbox.ask(screen, "Enter command(help for help)")
         if command == ['h', 'e', 'l', 'p']:
-            inputbox.say(screen, "TP - teleports player, using: tp;10;10", 0, True)
-        if command[0] == "t" and command[1] == "p":
-            args = "".join(command).split(";")
+            inputbox.say(screen, "teleport/tp - teleports player, using: tp 10,10", 0, True)
+        elif "".join(command).startswith("tp") or "".join(command).startswith("teleport"):
+            args = "".join(command).split(" ")
+            if(not len(args) == 3):
+                inputbox.say(screen,"Oops! Wrong usage!",0,True)
+                return
             character1.x = (int(args[1]) - 1) * settings.speed_x
             character1.y = (int(args[2]) - 1) * settings.speed_y
+        else:
+            inputbox.say(screen,"Oops! This command doesnt exists!",0,True)
+            return
     if (
             event.key == pygame.K_RIGHT or event.key == pygame.K_d) and character1.x + settings.speed_x * 2 < settings.width - (
             settings.width - settings.admin_width) // 2 and not isBlock(character1.x + settings.speed_x, character1.y):
