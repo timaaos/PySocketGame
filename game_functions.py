@@ -97,5 +97,7 @@ def update_screen(screen, character1):
     screen.blit(textsurface3, (0, 766))
     screen.blit(textsurface4, (250, 700))
     for i in block_list:
-        Block(screen, i[0], i[1]).blitme()
+        pygame.draw.rect(screen,(155, 155, 155),(i[0],i[1],settings.speed_x,settings.speed_y))
+        pygame.draw.rect(screen, (55, 55, 55), (i[0]-5, i[1]-5, settings.speed_x, settings.speed_y),10)
+        #Block(screen, i[0], i[1]).blitme()
     pygame.display.flip()
