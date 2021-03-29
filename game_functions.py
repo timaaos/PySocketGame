@@ -7,7 +7,7 @@ import inputbox
 block_list = []
 pygame.font.init()  # you have to call this at the start,
 # if you want to use this module.
-myfont = pygame.font.SysFont('Comic Sans MS', 30)
+myfont = pygame.font.SysFont('Comic Sans MS', 20)
 
 
 def check_down_events(event, character1, screen):
@@ -15,7 +15,7 @@ def check_down_events(event, character1, screen):
     if (event.key == pygame.K_t):
         command = inputbox.ask(screen, "Enter command(help for help)")
         if command == ['h', 'e', 'l', 'p']:
-            inputbox.say(screen, "teleport/tp - teleports player, using: tp 10,10", 0, True)
+            inputbox.say(screen, "teleport/tp - teleports player, using: tp 10 10", 0, True)
         elif "".join(command).startswith("tp") or "".join(command).startswith("teleport"):
             args = "".join(command).split(" ")
             if(not len(args) == 3):
@@ -86,10 +86,12 @@ def update_screen(screen, character1):
     textsurface = myfont.render('Arrows, WASD - Moving', False, (255, 255, 255))
     textsurface2 = myfont.render('Right Click - Place Block', False, (255, 255, 255))
     textsurface3 = myfont.render('Left Click - Destroy Block', False, (255, 255, 255))
+    textsurface4 = myfont.render('T - Open console', False, (255, 255, 255))
     character1.blitme()
-    screen.blit(textsurface, (0, 0))
-    screen.blit(textsurface2, (0, 50))
-    screen.blit(textsurface3, (0, 100))
+    screen.blit(textsurface, (0, 700))
+    screen.blit(textsurface2, (0, 733))
+    screen.blit(textsurface3, (0, 766))
+    screen.blit(textsurface4, (250, 700))
     for i in block_list:
         Block(screen, i[0], i[1]).blitme()
     pygame.display.flip()
