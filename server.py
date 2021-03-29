@@ -18,6 +18,7 @@ def accept_incoming_connections():
         client, client_address = SERVER.accept()
         print("%s:%s has connected." % client_address)
         client.send(bytes("{connected:true}", "utf8"))
+        broadcast(bytes('updatePls','utf8'))
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
 
@@ -27,7 +28,6 @@ def handle_client(client):  # Takes client socket as argument.
 
     name = client.recv(BUFSIZ).decode("utf8")[:-1]
     client.send(bytes('giveInfo', 'utf8'))
-    clientsnotready[client] = name
     clients[client] = name
     clientsbyname[name] = client
     players[name] = ast.literal_eval(client.recv(BUFSIZ).decode("utf8")[:-1])
@@ -46,17 +46,15 @@ def handle_client(client):  # Takes client socket as argument.
             client.send(bytes("^players^⊘" + str(players), 'utf8'))
             print('i sended players')
         if 'getBlocks' in msg.decode('utf8'):
-            client.send(bytes("^blocks^⊘" + str(blocks), 'utf8'))
-            print('i sended blocks')
-            time.sleep(0.2)
-            del clientsnotready[client]
+           client.send(bytes("^blocks^⊘" + str(blocks), 'utf8'))
+           print('i sended blocks')
+           time.sleep(0.2)
 
         if ("{'event':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
             print(mydict)
             players[str(mydict['id'])]['x'] = mydict['x']
             players[str(mydict['id'])]['y'] = mydict['y']
-            players[str(mydict['id'])]['char'] = mydict['char']
 
             broadcast(bytes(msg.decode('utf8'), 'utf8'))
         if ("{'blockplace':" in msg.decode('utf8')):
@@ -69,11 +67,6 @@ def handle_client(client):  # Takes client socket as argument.
             print(mydict)
             del blocks[str(mydict['id'])]
             broadcast(bytes(msg.decode('utf8'), 'utf8'))
-        #if ("{'bulletmove':" in msg.decode('utf8')):
-        #    mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
-        #    print(mydict)
-        #    bullets[str(mydict['bullet']['id'])] = mydict['bullet']
-        #    broadcast(bytes(msg.decode('utf8'), 'utf8'))
 
     del clients[client]
     del clientsbyname[name]
@@ -86,16 +79,7 @@ def broadcast(msg, prefix=""):  # prefix is for name identification.
     for sock in clients:
         sock.send(bytes(prefix, "utf8") + msg)
 
-def broadcastforready(msg, prefix=""):  # prefix is for name identification.
-    """Broadcasts a message to all the clients."""
-
-    for sock in clients:
-        if(sock in clientsnotready):
-            continue
-        sock.send(bytes(prefix, "utf8") + msg)
-
 clients = {}
-clientsnotready = {}
 clientsbyname = {}
 addresses = {}
 players = {}
@@ -104,23 +88,11 @@ bullets = {}
 
 HOST = ''
 PORT = 33000
-BUFSIZ = 2048
+BUFSIZ = 32000
 ADDR = (HOST, PORT)
 
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDR)
-def updateBullets():
-    for key,value in bullets.items():
-        print(value)
-        value['x'] = value['x'] + value['xadd']
-        value['y'] = value['y'] + value['yadd']
-        value['range'] = value['range'] - 1
-        if(value['range'] < 0):
-            del bullets[key]
-    print("^bullets^R" + str(bullets))
-    broadcastforready(bytes("^bullets^R" + str(bullets) + ';', 'utf8'))
-#rt = RepeatedTimer(0.25, updateBullets)
-#rt.start()
 if __name__ == "__main__":
     SERVER.listen(5)
     print("Waiting for connection...")

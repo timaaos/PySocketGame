@@ -20,13 +20,9 @@ import pygame
 import pygame.font
 import pygame.event
 import pygame.draw
-import os
-import sys
 from pygame.locals import *
 
-
-bad_words_file = os.path.os.path.dirname(os.path.realpath(sys.argv[0])) \
-                 + '/bad_words.txt'
+from settings import Settings
 
 def get_key():
     while 1:
@@ -39,18 +35,20 @@ def get_key():
 
 def display_box(screen, message):
     "Print a message in a box in the middle of the screen"
-    fontobject = pygame.font.Font(None, 18)
+    setting = Settings()
+    fontobject = pygame.font.SysFont("Comic Sans MS", 18)
     pygame.draw.rect(screen, (0, 0, 0),
-                     ((screen.get_width() / 2) - 100,
-                      (screen.get_height() / 2) - 10,
-                      200, 20), 0)
+                     (0,
+                      (setting.height - 165) - 10,
+                      401, 101), 0)
     pygame.draw.rect(screen, (255, 255, 255),
-                     ((screen.get_width() / 2) - 102,
-                      (screen.get_height() / 2) - 12,
-                      204, 24), 1)
+                     (0,
+                      (setting.height - 165) - 10,
+                      402, 142), 1)
     if len(message) != 0:
         screen.blit(fontobject.render(message, 1, (255, 255, 255)),
-                    ((screen.get_width() / 2) - 100, (screen.get_height() / 2) - 10))
+                    (0,
+                     (setting.height - 165) - 10))
     pygame.display.flip()
 
 
@@ -71,6 +69,18 @@ def ask(screen, question):
             current_string.append(chr(inkey))
         display_box(screen, question + ": " + "".join(current_string))
     return "".join(current_string)
+def say(screen,stringtosay,secs,whilenotclicked=False):
+    tick = 0
+    setting = Settings()
+    if(whilenotclicked):
+        while True:
+            display_box(screen, stringtosay)
+            if(not get_key() == None):
+                break
+        return
+    while tick < secs*setting.fps:
+        display_box(screen, stringtosay)
+        tick+=1
 
 
 def main():

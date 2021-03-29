@@ -14,13 +14,16 @@ import colorama
 from utils import Block, Bullet
 
 colorama.init()
+
+
 class Rotation(Enum):
     UP = 0
     DOWN = 2
     LEFT = 3
     RIGHT = 1
 
-screensize = [32,16]
+
+screensize = [32, 16]
 
 # Collect events until released
 
@@ -44,6 +47,7 @@ import screen
 receivequit = False
 import keyboard
 
+
 class player():
     def __init__(self):
         self.x = 0
@@ -57,15 +61,16 @@ class player():
         self.blocks = {}
         self.bullets = {}
         self.delays = False
-    def move(self, forward, rotation = 0):
+
+    def move(self, forward, rotation=0):
         if not self.delays:
 
             xadd = 0
             yadd = 0
             if (rotation == 1):
-                self.rotation+=1
+                self.rotation += 1
             if (rotation == -1):
-                self.rotation-=1
+                self.rotation -= 1
             if (self.rotation == 0):
                 yadd = -1
             if (self.rotation == 1):
@@ -84,27 +89,21 @@ class player():
             if (not self.isBlock(self.getForwardPos()) and forward > 0):
                 self.x += xadd
                 self.y += yadd
-            if (self.x > screensize[0]-1):
+            if (self.x > screensize[0] - 1):
                 self.x = 0
-            elif(self.x < 0):
-                self.x = screensize[0]-1
-            if (self.y > screensize[1]-1):
+            elif (self.x < 0):
+                self.x = screensize[0] - 1
+            if (self.y > screensize[1] - 1):
                 self.y = 0
-            elif(self.y < 0):
-                self.y = screensize[1]-1
+            elif (self.y < 0):
+                self.y = screensize[1] - 1
             self.char = rotationchar[self.rotation]
-            movedict = {'event': 'move', 'x': self.x, 'y': self.y,'char':rotationchar[self.rotation],'rotation':self.rotation, 'id': str(self.id)}
-            #print(movedict)
             send(str(movedict))
             self.delays = True
             sleep(0.15)
             self.delays = False
         else:
             return
-    def removeBlock(self):
-        pos = self.getForwardPos()
-        if(self.isBlock(pos)):
-            send(str({'blockremove':True,'id':self.getBlockIdByPos(pos)}))
 
     def getForwardPos(self):
         yadd = 0
@@ -119,7 +118,8 @@ class player():
             xadd = -1
         x = self.x + xadd
         y = self.y + yadd
-        return (x,y)
+        return (x, y)
+
     def getBackwardPos(self):
         yadd = 0
         xadd = 0
@@ -133,30 +133,27 @@ class player():
             xadd = 1
         x = self.x + xadd
         y = self.y + yadd
-        return (x,y)
+        return (x, y)
+
     def Tips(self):
         print('X:' + str(player.x))
         print('Y:' + str(player.y))
         print("Controls:\nWAD - Move, Rotate\nE - Place Block\nESC - Leave")
+
     def placeBlock(self):
         block = Block('clay')
         block.x = player.getForwardPos()[0]
         block.y = player.getForwardPos()[1]
-        if(not self.isBlock(player.getForwardPos())):
-            send(str({'blockplace':True,'block':block.getInfo()}))
+        if (not self.isBlock(player.getForwardPos())):
+            send(str({'blockplace': True, 'block': block.getInfo()}))
+
     def isBlock(self, pos):
         for key, value in player.blocks.items():
-            if(value['x'] == pos[0] and value['y'] == pos[1]):
+            if (value['x'] == pos[0] and value['y'] == pos[1]):
                 return True
         return False
-    def getBlockIdByPos(self,pos):
-        if(self.isBlock(pos)):
-            for key, value in player.blocks.items():
-                if(value['x'] == pos[0] and value['y'] == pos[1]):
-                    return value['id']
-        return False
     def pewpew(self):
-        if(self.reload): return
+        if (self.reload): return
         bullet = Bullet()
         bullet.x = self.getForwardPos()[0]
         bullet.y = self.getForwardPos()[1]
@@ -172,10 +169,12 @@ class player():
             xadd = -1
         bullet.xadd = xadd
         bullet.yadd = yadd
-        send(str({'bulletmove':True,'bullet':bullet.getInfo()}))
+        send(str({'bulletmove': True, 'bullet': bullet.getInfo()}))
         reload()
+
     def infodict(self):
-        return str({'x':self.x,'y':self.y,'char':player.char,'id':player.id})
+        return str({'x': self.x, 'y': self.y, 'char': player.char, 'id': player.id})
+
     def renderPlayers(self):
         clear()
         screenobj = screen.screen(screensize[0], screensize[1])
@@ -188,34 +187,37 @@ class player():
         print(screenobj.screenstr)
         self.Tips()
 
+
 def reload():
     sleep(1)
     player.reload = False
+
+
 def receive():
     """Handles receiving of messages."""
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
-            #print("i recieved: " + msg)
+            # print("i recieved: " + msg)
             if (msg == "{quit:true}"):
                 receivequit = True
-            #if("^sockets^" in msg):
-                #player.sockets = ast.literal_eval(msg.split('⊘')[1])
-            if("^players^" in msg):
+            # if("^sockets^" in msg):
+            # player.sockets = ast.literal_eval(msg.split('⊘')[1])
+            if ("^players^" in msg):
                 send('getBlocks')
                 player.players = ast.literal_eval(msg.split('⊘')[1])
                 player.renderPlayers()
             if ("^blocks^" in msg):
-                #print('igotblocks')
+                # print('igotblocks')
                 player.blocks = ast.literal_eval(msg.split('⊘')[1])
                 player.renderPlayers()
             if (msg.startswith("^bullets^")):
-                #print(msg.split(';')[0].split('R')[1][:-1])
+                # print(msg.split(';')[0].split('R')[1][:-1])
                 player.bullets = ast.literal_eval(msg.split(';')[0].split('R')[1])
                 player.renderPlayers()
             if ("{'event':" in msg):
                 mydict = ast.literal_eval(msg.split(';')[0])
-                #print(mydict)
+                # print(mydict)
                 player.players[str(mydict['id'])]['x'] = mydict['x']
                 player.players[str(mydict['id'])]['y'] = mydict['y']
                 player.players[str(mydict['id'])]['char'] = mydict['char']
@@ -227,16 +229,10 @@ def receive():
                 player.renderPlayers()
             if ("{'bulletmove':" in msg):
                 mydict = ast.literal_eval(msg.split(';')[0])
-                #print(mydict)
+                # print(mydict)
                 player.bullets[str(mydict['bullet']['id'])] = mydict['bullet']
             if ("{update}" == msg):
                 send("getPlayers")
-            if ("{'blockremove':" in msg):
-                mydict = ast.literal_eval(msg.split(';')[0])
-                print(mydict)
-                del player.blocks[str(mydict['id'])]
-                player.renderPlayers()
-            if("giveInfo" == msg):
                 send(player.infodict())
                 send("getPlayers")
 
@@ -253,7 +249,7 @@ def getplayerbyid(playerarr, id):
 
 def send(msg):  # event is passed by binders.
     """Handles sending of messages."""
-    #print("i sended: " + msg)
+    # print("i sended: " + msg)
     msg = msg + ";"
     client_socket.send(bytes(msg, "utf8"))
 
@@ -268,20 +264,21 @@ else:
 BUFSIZ = 2048
 ADDR = (HOST, PORT)
 print("Colors:")
-cprint('Blue 1','blue','on_grey')
-cprint('Red 2','red','on_grey')
-cprint('Cyan 3','cyan','on_grey')
-cprint('Magenta 4','magenta','on_grey')
+cprint('Blue 1', 'blue', 'on_grey')
+cprint('Red 2', 'red', 'on_grey')
+cprint('Cyan 3', 'cyan', 'on_grey')
+cprint('Magenta 4', 'magenta', 'on_grey')
 colornum = input("Enter color:")
-if(colornum == '1'):
+if (colornum == '1'):
     color = 'blue'
-elif(colornum == '2'):
+elif (colornum == '2'):
     color = 'red'
-elif(colornum == '3'):
+elif (colornum == '3'):
     color = 'cyan'
-elif(colornum == '4'):
+elif (colornum == '4'):
     color = 'magenta'
-rotationchar = [colored('↑','white','on_'+color),colored('→','white','on_'+color),colored('↓','white','on_'+color),colored('←','white','on_'+color)]
+rotationchar = [colored('↑', 'white', 'on_' + color), colored('→', 'white', 'on_' + color),
+                colored('↓', 'white', 'on_' + color), colored('←', 'white', 'on_' + color)]
 client_socket = socket(AF_INET, SOCK_STREAM)
 client_socket.connect(ADDR)
 player = player()
@@ -289,10 +286,3 @@ receive_thread = Thread(target=receive)
 receive_thread.start()
 player.id = str(random.randint(0, 9999))
 send(str(player.id))
-keyboard.on_release_key("w", lambda _:player.move(1,0))
-keyboard.on_release_key("s", lambda _:player.move(-1,0))
-keyboard.on_release_key("a", lambda _:player.move(0,-1))
-keyboard.on_release_key("d", lambda _:player.move(0,1))
-keyboard.on_release_key("e", lambda _:player.placeBlock())
-keyboard.on_release_key("q", lambda _:player.removeBlock())
-keyboard.on_release_key("esc", lambda _:exit())
