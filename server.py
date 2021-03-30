@@ -6,11 +6,6 @@ from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import ast
 
-from repeat_timer import RepeatedTimer
-
-global getPlayerDict
-
-getPlayerDict = {}
 
 
 def accept_incoming_connections():
