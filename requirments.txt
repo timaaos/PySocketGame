@@ -1,4 +1,1 @@
-keyboard
-termcolor2
-termcolor
-colorama
+pygame

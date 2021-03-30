@@ -1,4 +1,5 @@
 import sys
+import time
 
 import pygame
 
@@ -10,6 +11,13 @@ import random
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import ast
+def stoppls():
+    send('closeMe')
+    client_socket.close()
+    pygame.quit()
+    sys.exit()
+
+
 def receive():
     """Handles receiving of messages."""
     while True:
@@ -71,7 +79,7 @@ if __name__ == '__main__':
         PORT = 33000
     else:
         PORT = int(PORT)
-    BUFSIZ = 32000
+    BUFSIZ = 4096
     ADDR = (HOST, PORT)
     client_socket = socket(AF_INET, SOCK_STREAM)
     client_socket.connect(ADDR)
@@ -96,10 +104,7 @@ if __name__ == '__main__':
         print(game_functions.player_list)
         update_screen(screen, character)
         clock.tick(settings.fps)
-    send('closeMe')
-    client_socket.close()
-    pygame.quit()
-    sys.exit()
+    stoppls()
 #!/usr/bin/env python3
 """Script for Tkinter GUI chat client."""
 import ast
