@@ -22,6 +22,10 @@ def accept_incoming_connections():
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
 
+def infolog(msg):
+    print('[INFO]: ' + msg)
+def eventlog(msg):
+    print('[EVENT]: ' + msg)
 
 def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
@@ -30,47 +34,40 @@ def handle_client(client):  # Takes client socket as argument.
     client.send(bytes('giveInfo', 'utf8'))
     clients[client] = name
     clientsbyname[name] = client
-    players[name] = ast.literal_eval(client.recv(BUFSIZ).decode("utf8")[:-1])
-    print(clients)
-    broadcast(bytes("^players^⊘" + str(players), 'utf8'))
+    player_list[name] = ast.literal_eval(client.recv(BUFSIZ).decode("utf8")[:-1])
+    infolog('Player with id ' + name + ' joined')
+    broadcast(bytes("^players^⊘" + str(player_list), 'utf8'))
     while True:
         msg = client.recv(BUFSIZ)
-        print(msg.decode('utf8'))
-        if msg == bytes("{quit:true}", "utf8"):
-            client.send(bytes("{quit:true}", "utf8"))
-            client.close()
-            del clients[client]
-            broadcast(bytes("{msg:'%s has left the game.'}" % name, "utf8"))
-            break
         if msg == bytes("getPlayers", "utf8"):
-            client.send(bytes("^players^⊘" + str(players), 'utf8'))
-            print('i sended players')
+            infolog('Replied to getPlayers command by ' + name)
+            client.send(bytes("^players^⊘" + str(player_list), 'utf8'))
         if 'getBlocks' in msg.decode('utf8'):
-           client.send(bytes("^blocks^⊘" + str(blocks), 'utf8'))
-           print('i sended blocks')
-           time.sleep(0.2)
-
+            infolog('Replied to getBlocks command by ' + name)
+            client.send(bytes("^blocks^⊘" + str(block_list), 'utf8'))
         if ("{'event':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
-            print(mydict)
-            players[str(mydict['id'])]['x'] = mydict['x']
-            players[str(mydict['id'])]['y'] = mydict['y']
-
-            broadcast(bytes(msg.decode('utf8'), 'utf8'))
+            player_list[str(mydict['id'])]['x_pos'] = mydict['x_pos']
+            player_list[str(mydict['id'])]['y_pos'] = mydict['y_pos']
+            broadcast(msg)
+            eventlog('MoveEvent event by ' + name + ' to x:' + str(mydict['x_pos']) + ' y:' + str(mydict['y_pos']))
         if ("{'blockplace':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
-            print(mydict)
-            blocks[str(mydict['block']['id'])] = mydict['block']
-            broadcast(bytes(msg.decode('utf8'), 'utf8'))
+            block_list.append(
+                [mydict['x_pos'], mydict['y_pos']])
+            broadcast(msg)
+            eventlog('BlockPlace event by ' + name)
         if ("{'blockremove':" in msg.decode('utf8')):
             mydict = ast.literal_eval(msg.decode('utf8').split(';')[0])
-            print(mydict)
-            del blocks[str(mydict['id'])]
-            broadcast(bytes(msg.decode('utf8'), 'utf8'))
-
+            block_list.remove([mydict['x_pos'],mydict['y_pos']])
+            broadcast(msg)
+            eventlog('BlockRemove event by ' + name)
+        if('closeMe' in msg.decode('utf8')):
+            infolog(name + ' leaved!')
+            break
     del clients[client]
     del clientsbyname[name]
-    del players[name]
+    del player_list[name]
 
 
 def broadcast(msg, prefix=""):  # prefix is for name identification.
@@ -82,8 +79,8 @@ def broadcast(msg, prefix=""):  # prefix is for name identification.
 clients = {}
 clientsbyname = {}
 addresses = {}
-players = {}
-blocks = {}
+player_list = {}
+block_list = []
 bullets = {}
 
 HOST = ''
