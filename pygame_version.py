@@ -24,7 +24,6 @@ def receive():
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
-            print(msg)
             if ("^players^" in msg):
                 send('getBlocks')
                 game_functions.player_list = ast.literal_eval(msg.split('⊘')[1])
@@ -88,7 +87,6 @@ if __name__ == '__main__':
     receive_thread.start()
     character.id = str(random.randint(0, 9999))
     send(str(character.id))
-    print(player_list)
 
     close = True
     """Конец серверной части"""
@@ -102,7 +100,6 @@ if __name__ == '__main__':
         if (character.remblockvar):
             send(character.remBlock())
         # Рисуем поле
-        print(game_functions.player_list)
         update_screen(screen, character)
         clock.tick(settings.fps)
     stoppls()
