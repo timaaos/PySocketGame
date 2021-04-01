@@ -37,7 +37,6 @@ def handle_client(client):  # Takes client socket as argument.
         while True:
             msg = client.recv(BUFSIZ)
             if(bytes('closeMe;','utf8') == msg):
-                infolog(name + ' leaved!')
                 break
             if msg == bytes("getPlayers", "utf8"):
                 infolog('Replied to getPlayers command by ' + name)
@@ -62,9 +61,18 @@ def handle_client(client):  # Takes client socket as argument.
                 block_list.remove([mydict['x_pos'],mydict['y_pos']])
                 broadcast(msg)
                 eventlog('BlockRemove event by ' + name)
+        del clients[client]
+        del clientsbyname[name]
+        del player_list[name]
+        infolog(name + ' leaved!')
     except ConnectionResetError:
+        del clients[client]
+        del clientsbyname[name]
+        del player_list[name]
+        infolog(name + ' leaved!')
         client.close()
         pass
+    client.close()
 
 def broadcast(msg, prefix=""):  # prefix is for name identification.
     """Broadcasts a message to all the clients."""
