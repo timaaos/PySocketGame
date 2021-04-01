@@ -27,7 +27,6 @@ def receive():
             if ("^players^" in msg):
                 send('getBlocks')
                 game_functions.player_list = ast.literal_eval(msg.split('⊘')[1])
-                print(game_functions.player_list)
             if ("^blocks^" in msg):
                 game_functions.block_list = ast.literal_eval(msg.split('⊘')[1])
             if ("{'event':" in msg):
