@@ -74,6 +74,7 @@ if __name__ == '__main__':
     """Серверная часть"""
     HOST = "".join(inputbox.ask(screen,'Enter host'))
     PORT = "".join(inputbox.ask(screen,'Enter port'))
+    character.name = "".join(inputbox.ask(screen, 'Enter nickname'))
     if not PORT:
         PORT = 33000
     else:
@@ -85,7 +86,7 @@ if __name__ == '__main__':
     receive_thread = Thread(target=receive)
     receive_thread.start()
     character.id = str(random.randint(0, 9999))
-    send(str(character.id))
+    send(str(character.id) + "♣" + str(character.name))
 
     close = True
     """Конец серверной части"""

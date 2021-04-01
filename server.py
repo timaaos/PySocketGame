@@ -25,13 +25,14 @@ def eventlog(msg):
 
 def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
-
-    name = client.recv(BUFSIZ).decode("utf8")[:-1]
+    namelist = client.recv(BUFSIZ).decode("utf8")[:-1].split("♣")
+    name = namelist[0]
+    nick = namelist[1]
     client.send(bytes('giveInfo', 'utf8'))
     clients[client] = name
     clientsbyname[name] = client
     player_list[name] = ast.literal_eval(client.recv(BUFSIZ).decode("utf8")[:-1])
-    infolog('Player with id ' + name + ' joined')
+    infolog('Player with id ' + name + ' and name ' + nick + 'joined')
     broadcast(bytes("^players^⊘" + str(player_list), 'utf8'))
     try:
         while True:
@@ -76,10 +77,11 @@ def handle_client(client):  # Takes client socket as argument.
 
 def broadcast(msg, prefix=""):  # prefix is for name identification.
     """Broadcasts a message to all the clients."""
-
-    for sock in clients:
-        sock.send(bytes(prefix, "utf8") + msg)
-
+    try:
+        for sock in clients:
+            sock.send(bytes(prefix, "utf8") + msg)
+    except BrokenPipeError:
+        pass
 clients = {}
 clientsbyname = {}
 addresses = {}

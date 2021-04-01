@@ -22,6 +22,7 @@ class Character:
         self.remblockvar = False
         self.setblockpos = (0,0)
         self.remblockpos = (0,0)
+        self.name = ""
     def sendMoveData(self):
         self.move = False
         return str({'event':'move','x_pos':self.x,'y_pos':self.y,'id':self.id})
@@ -32,7 +33,7 @@ class Character:
         self.remblockvar = False
         return str({'blockremove': True, 'x_pos': self.remblockpos[0], 'y_pos': self.remblockpos[1]})
     def sendMyData(self):
-        return str({'x_pos': self.x, 'y_pos': self.y})
+        return str({'x_pos': self.x, 'y_pos': self.y,'name':self.name})
     def blitme(self):
         self.screen.blit(self.image, self.rect)
     def update(self):

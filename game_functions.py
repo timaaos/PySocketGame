@@ -119,4 +119,7 @@ def update_screen(screen, character1):
 
     for k,v in player_list.items():
         Character(screen,v['x_pos'],v['y_pos']).blitme()
+    for k, v in player_list.items():
+        textname = myfont.render(v['name'], False, (255, 255, 255))
+        screen.blit(textname, (v['x_pos'], v['y_pos']-33))
     pygame.display.flip()
