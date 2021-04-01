@@ -59,6 +59,11 @@ def isBlock(x, y):
         if block[0] == x and block[1] == y:
             return True
     return False
+def isPlayer(x, y):
+    for k,v in player_list.items():
+        if v['x_pos'] == x and v['y_pos'] == y:
+            return True
+    return False
 def delBlock(x,y):
     for block in block_list:
         if block[0] == x and block[1] == y:
@@ -68,7 +73,7 @@ def check_mouse_events(event,character1):
     settings = Settings()
     if pygame.mouse.get_pressed()[2]:
         if ((event.pos[1] - event.pos[
-            1] % settings.speed_y) + settings.speed_y < settings.admin_height - settings.admin_height * 0.20):
+            1] % settings.speed_y) + settings.speed_y < settings.admin_height - settings.admin_height * 0.20 and not isBlock(event.pos[0] - event.pos[0] % settings.speed_x, event.pos[1] - event.pos[1] % settings.speed_y) and not isPlayer(event.pos[0] - event.pos[0] % settings.speed_x, event.pos[1] - event.pos[1] % settings.speed_y)):
             #block_list.append(
             #    [event.pos[0] - event.pos[0] % settings.speed_x, event.pos[1] - event.pos[1] % settings.speed_y])
             character1.setblockvar = True

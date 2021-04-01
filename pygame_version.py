@@ -4,6 +4,7 @@ import time
 import pygame
 
 import game_functions
+import inputbox
 from settings import Settings
 from game_functions import check_events, update_screen, block_list, delBlock, character_list, player_list
 from character import Character
@@ -73,8 +74,8 @@ if __name__ == '__main__':
     pos = x, y = (settings.width - settings.admin_width) // 2, 0
     character = Character(screen, x, y)
     """Серверная часть"""
-    HOST = input('Enter host: ')
-    PORT = input('Enter port: ')
+    HOST = "".join(inputbox.ask(screen,'Enter host'))
+    PORT = "".join(inputbox.ask(screen,'Enter port'))
     if not PORT:
         PORT = 33000
     else:
